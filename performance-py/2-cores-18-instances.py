@@ -37,7 +37,7 @@ from warnings import simplefilter
 
 
 print('-----------------------------------------------')
-print('----------- 2 cores & 12 instances ------------')
+print('----------- 2 cores & 18 instances ------------')
 print('-----------------------------------------------')
 print('')
 print('')
@@ -53,7 +53,7 @@ print('')
 
 # Create spark session and define cores & instances
 spark = SparkSession.builder.config('spark.driver.memory', '1g').config('spark.executor.memory', '4g') \
-.config('spark.executor.instances', '12').config('spark.executor.cores','2').config('spark.driver.maxResultSize', '1g') \
+.config('spark.executor.instances', '18').config('spark.executor.cores','2').config('spark.driver.maxResultSize', '1g') \
 .master('yarn').appName('egd').getOrCreate()
 
 
@@ -94,7 +94,7 @@ elapsed_time = end_time-start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Sample loading',
     'Execution Time': elapsed_time,
@@ -135,7 +135,7 @@ elapsed_time = end_time-start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Query 1',
     'Execution Time': elapsed_time,
@@ -175,7 +175,7 @@ elapsed_time = end_time-start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Query 2',
     'Execution Time': elapsed_time,
@@ -218,7 +218,7 @@ elapsed_time = end_time-start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Query 3',
     'Execution Time': elapsed_time,
@@ -472,7 +472,7 @@ elapsed_time = end_time - start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Liner Regression',
     'Execution Time': elapsed_time,
@@ -503,7 +503,7 @@ elapsed_time = end_time - start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Decison Tree',
     'Execution Time': elapsed_time,
@@ -533,7 +533,7 @@ elapsed_time = end_time - start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Random Forest Regression',
     'Execution Time': elapsed_time,
@@ -599,7 +599,7 @@ elapsed_time = end_time-start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Sample loading',
     'Execution Time': elapsed_time,
@@ -641,7 +641,7 @@ elapsed_time = end_time-start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Query 1',
     'Execution Time': elapsed_time,
@@ -682,7 +682,7 @@ elapsed_time = end_time-start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Query 2',
     'Execution Time': elapsed_time,
@@ -725,7 +725,7 @@ elapsed_time = end_time-start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Query 3',
     'Execution Time': elapsed_time,
@@ -926,7 +926,7 @@ elapsed_time = end_time - start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Liner Regression',
     'Execution Time': elapsed_time,
@@ -957,7 +957,7 @@ elapsed_time = end_time - start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Decision Tree',
     'Execution Time': elapsed_time,
@@ -987,7 +987,7 @@ elapsed_time = end_time - start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Random Forest Regression',
     'Execution Time': elapsed_time,
@@ -1044,7 +1044,7 @@ elapsed_time = end_time-start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Sample loading',
     'Execution Time': elapsed_time,
@@ -1086,7 +1086,7 @@ elapsed_time = end_time-start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Query 1',
     'Execution Time': elapsed_time,
@@ -1126,7 +1126,7 @@ elapsed_time = end_time-start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Query 2',
     'Execution Time': elapsed_time,
@@ -1169,7 +1169,7 @@ elapsed_time = end_time-start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Query 3',
     'Execution Time': elapsed_time,
@@ -1370,7 +1370,7 @@ elapsed_time = end_time - start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Liner Regression',
     'Execution Time': elapsed_time,
@@ -1401,7 +1401,7 @@ elapsed_time = end_time - start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Decision Tree',
     'Execution Time': elapsed_time,
@@ -1431,7 +1431,7 @@ elapsed_time = end_time - start_time
 cpu_usage = psutil.cpu_percent()
 
 performance_dict = {
-    'Cores & Instances': '2 cores & 12 instances',
+    'Cores & Instances': '2 cores & 18 instances',
     'Dataset size': sample_size_mb,
     'Query/Model': 'Random Forest Regression',
     'Execution Time': elapsed_time,

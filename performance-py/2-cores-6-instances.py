@@ -67,7 +67,7 @@ spark = SparkSession.builder.config('spark.driver.memory', '1g').config('spark.e
 # df=spark.read.csv(bucket_path, header=True)
 # df.show()
 
-file_path = 'gs://egd-project-vp-1/egd-project/notebooks_jupyter_notebooks_jupyter_vehicles.csv'
+file_path = 'gs://egd-bucket/perfomance/notebooks_jupyter_notebooks_jupyter_vehicles.csv'
 df = (spark.read.format('csv').option('header', 'true').option('inferSchema','true').load(file_path))
 df.show()
 
@@ -1459,7 +1459,7 @@ final_df_spark = final_df_spark.select('Cores & Instances', 'Query/Model', 'Data
 final_df_spark.show()
 
 # Save to csv
-output_path = "gs://egd-project-vp-1/egd-project/2-cores-6-instances.csv"
+output_path = "gs://egd-bucket/perfomance/csv"
 
 # Write DataFrame to CSV file
 final_df_spark.write.format("csv").option("header", "true").mode("overwrite").save(output_path)
