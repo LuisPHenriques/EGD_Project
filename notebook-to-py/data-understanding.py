@@ -1,23 +1,22 @@
+from io import BytesIO, StringIO
+from google.cloud import storage
+
 import pyspark
 from pyspark.sql import SparkSession
 from pyspark import SparkContext, SparkConf 
 from pyspark.sql import types
 from pyspark.sql import functions as F
-from pyspark.ml.feature import Imputer, VectorAssembler, StringIndexer
-from pyspark.sql.functions import udf
-from pyspark.sql.types import StringType
-from pyspark.sql.functions import upper, avg, year, to_date, sqrt, log, lower, col, row_number, asc, lit, count, expr, percentile_approx, monotonically_increasing_id, udf, skewness, regexp_extract
-from pyspark.sql.functions import row_number, asc, lit
+from pyspark.ml.feature import Imputer, VectorAssembler, StringIndexer, OneHotEncoder
+from pyspark.sql.types import StringType, IntegerType, StructType, StructField, DoubleType
+from pyspark.sql.functions import when, upper, avg, year, to_date, sqrt, log, lower, col, row_number, asc, lit, count, expr, percentile_approx, monotonically_increasing_id, udf, skewness, regexp_extract
 from pyspark.sql.window import Window
-from pyspark.sql.functions import upper
-from pyspark.sql.functions import regexp_extract
 #from plotly.offline import iplot
 #import plotly.graph_objs as go
 from pyspark.sql.functions import round
 #import plotly.express as px
-from google.cloud import storage
-
-
+from pyspark.ml.evaluation import RegressionEvaluator
+from pyspark.ml.regression import LinearRegression, IsotonicRegression, FMRegressor, DecisionTreeRegressor, RandomForestRegressor, GBTRegressor, GeneralizedLinearRegression
+from pyspark.ml import Pipeline
 
 # Utilities
 import os
@@ -28,24 +27,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 #import pandas_profiling as pp
+import time
+import psutil
 
-# Models
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
-from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV, StratifiedKFold
-from sklearn.linear_model import LinearRegression
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import RandomForestRegressor, BaggingRegressor, AdaBoostRegressor, GradientBoostingRegressor, VotingRegressor, ExtraTreesRegressor
-from sklearn.svm import LinearSVR, SVR
-#import xgboost as xgb
-from sklearn import metrics
-
-#sparksession
-from pyspark.sql import SparkSession
+# Others (warnings etc)
+from warnings import simplefilter
 
 # Create a SparkSession
 #spark = SparkSession.builder.config('...').master('yarn').appName('egd').getOrCreate()
 spark = SparkSession.builder.config('spark.driver.memory', '1g').config('spark.executor.memory', '4g') \
-.config('spark.executor.instances', '2').config('spark.executor.cores','2').config('spark.driver.maxResultSize', '1g') \
+.config('spark.executor.instances', '6').config('spark.executor.cores','2').config('spark.driver.maxResultSize', '1g') \
 .master('yarn').appName('egd').getOrCreate()
 
 file_path = 'gs://egd-project-vp-1/egd-project/notebooks_jupyter_notebooks_jupyter_vehicles.csv'
@@ -96,42 +87,44 @@ from pyspark.sql.functions import lit
 import matplotlib.pyplot as plt
 
 # create a bar chart of number of listings by manufacturer
-plt.figure(figsize=(25,6))
+# plt.figure(figsize=(25,6))
 manufacturer_counts_filtered = manufacturer_counts.filter(F.col('manufacturer').isNotNull() & F.col('num_listings').isNotNull())
 manufacturer_counts_updated = manufacturer_counts_filtered.select('manufacturer', 'num_listings').orderBy('num_listings', ascending=False).collect()
 manufacturer = [row.manufacturer for row in manufacturer_counts_updated]
 num_listings = [row.num_listings for row in manufacturer_counts_updated]
-plt.bar(manufacturer, num_listings)
-plt.title('Number of Listings by Manufacturer')
-plt.xlabel('Manufacturer')
-plt.ylabel('Number of Listings')
-plt.xticks(rotation=90)
-# save the plot
-# try:
-# 	bucket_name = 'egd-project-vp-1'
-# 	blob_name = 'egd-project/Number of Listings by Manufacturer.png'  # specify the folder name
-# 	client = storage.Client()
-# 	bucket = client.bucket(bucket_name)
-# 	blob = bucket.blob(blob_name)
-# 	with plt.rc_context({'figure.dpi': 300}):  # set DPI value to 300
-# 	    plt.savefig('/tmp/plot.png')
-# 	with open('/tmp/plot.png', 'rb') as f:
-# 	    blob.upload_from_file(f)
-# 	print('Plot saved successfully!')
-# except:
-# 	print('Plot was not saved!')
-plt.show()
+# plt.bar(manufacturer, num_listings)
+# plt.title('Number of Listings by Manufacturer')
+# plt.xlabel('Manufacturer')
+# plt.ylabel('Number of Listings')
+# plt.xticks(rotation=90)
+# # save the plot
+# # try:
+# # 	bucket_name = 'egd-project-vp-1'
+# # 	blob_name = 'egd-project/Number of Listings by Manufacturer.png'  # specify the folder name
+# # 	client = storage.Client()
+# # 	bucket = client.bucket(bucket_name)
+# # 	blob = bucket.blob(blob_name)
+# # 	with plt.rc_context({'figure.dpi': 300}):  # set DPI value to 300
+# # 	    plt.savefig('/tmp/plot.png')
+# # 	with open('/tmp/plot.png', 'rb') as f:
+# # 	    blob.upload_from_file(f)
+# # 	print('Plot saved successfully!')
+# # except:
+# # 	print('Plot was not saved!')
+# plt.show()
+# manufacturer.show(20)
+# num_listings.show(20)
 
 # create a scatterplot of average price vs. number of listings by manufacturer
-plt.figure(figsize=(25,6))
-df_scatter = manufacturer_counts.select('num_listings', 'avg(price)').collect()
-num_listings = [row['num_listings'] for row in df_scatter]
-avg_price = [row['avg(price)'] for row in df_scatter]
-plt.scatter(num_listings, avg_price)
-plt.title('Average Price vs. Number of Listings by Manufacturer')
-plt.xlabel('Number of Listings')
-plt.ylabel('Average Price')
-plt.show()
+# plt.figure(figsize=(25,6))
+# df_scatter = manufacturer_counts.select('num_listings', 'avg(price)').collect()
+# num_listings = [row['num_listings'] for row in df_scatter]
+# avg_price = [row['avg(price)'] for row in df_scatter]
+# plt.scatter(num_listings, avg_price)
+# plt.title('Average Price vs. Number of Listings by Manufacturer')
+# plt.xlabel('Number of Listings')
+# plt.ylabel('Average Price')
+# plt.show()
 
 print('Trying to categorize the number of online dealership, physical dealership, and private party dealer to the best of my ability')
 
@@ -156,30 +149,30 @@ df = df.withColumn('category', categorize_description_udf('description'))
 # calculate the percentage of descriptions in each category
 category_counts = df.groupby('category').count()
 category_counts = category_counts.withColumn('percentage', category_counts['count'] / df.count() * 100).orderBy('percentage', ascending=False)
-category_counts.show()
+category_counts.show(20)
 
-# collect the data
-category_counts_list = category_counts.collect()
+# # collect the data
+# category_counts_list = category_counts.collect()
 
-# extract the data into separate arrays
-categories = [row['category'] for row in category_counts_list]
-percentages = [row['percentage'] for row in category_counts_list]
-# create a figure and axis object
-fig, ax = plt.subplots()
+# # extract the data into separate arrays
+# categories = [row['category'] for row in category_counts_list]
+# percentages = [row['percentage'] for row in category_counts_list]
+# # create a figure and axis object
+# fig, ax = plt.subplots()
 
-# set the x and y labels, title, and rotation of x-tick labels
-ax.set_xlabel('Category')
-ax.set_ylabel('Percentage')
-ax.set_title('Percentage of Car Listings by Category')
-ax.set_xticklabels(categories, rotation=0)
+# # set the x and y labels, title, and rotation of x-tick labels
+# ax.set_xlabel('Category')
+# ax.set_ylabel('Percentage')
+# ax.set_title('Percentage of Car Listings by Category')
+# ax.set_xticklabels(categories, rotation=0)
 
-# create the bar chart
-x_pos = np.arange(len(categories))
-ax.bar(x_pos, percentages)
-ax.set_xticks(x_pos)
+# # create the bar chart
+# x_pos = np.arange(len(categories))
+# ax.bar(x_pos, percentages)
+# ax.set_xticks(x_pos)
 
-# show the chart
-plt.show()
+# # show the chart
+# plt.show()
 
 print('What are the oldest cars?')
 
