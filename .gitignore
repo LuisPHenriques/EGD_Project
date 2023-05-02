@@ -350,5 +350,5 @@ pyrightconfig.json
 
 notebooks_jupyter_notebooks_jupyter_vehicles.csv
 notebooks_jupyter_notebooks_jupyter_vehicles.parquet
-
+.DS_Store
 
