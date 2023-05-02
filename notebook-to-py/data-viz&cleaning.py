@@ -1,8 +1,6 @@
 from io import BytesIO, StringIO
 from google.cloud import storage
 
-import time
-import psutil
 import pyspark
 from pyspark.sql import SparkSession
 from pyspark import SparkContext, SparkConf 
@@ -12,11 +10,13 @@ from pyspark.ml.feature import Imputer, VectorAssembler, StringIndexer, OneHotEn
 from pyspark.sql.types import StringType, IntegerType, StructType, StructField, DoubleType
 from pyspark.sql.functions import when, upper, avg, year, to_date, sqrt, log, lower, col, row_number, asc, lit, count, expr, percentile_approx, monotonically_increasing_id, udf, skewness, regexp_extract
 from pyspark.sql.window import Window
+#from plotly.offline import iplot
+#import plotly.graph_objs as go
 from pyspark.sql.functions import round
+#import plotly.express as px
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml.regression import LinearRegression, IsotonicRegression, FMRegressor, DecisionTreeRegressor, RandomForestRegressor, GBTRegressor, GeneralizedLinearRegression
 from pyspark.ml import Pipeline
-from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
 
 # Utilities
 import os
@@ -32,10 +32,11 @@ import psutil
 
 # Others (warnings etc)
 from warnings import simplefilter
+
 # Create a SparkSession
 #spark = SparkSession.builder.config('...').master('yarn').appName('egd').getOrCreate()
 spark = SparkSession.builder.config('spark.driver.memory', '1g').config('spark.executor.memory', '4g') \
-.config('spark.executor.instances', '2').config('spark.executor.cores','2').config('spark.driver.maxResultSize', '1g') \
+.config('spark.executor.instances', '6').config('spark.executor.cores','2').config('spark.driver.maxResultSize', '1g') \
 .master('yarn').appName('egd').getOrCreate()
 
 file_path = 'gs://egd-project-vp-1/egd-project/notebooks_jupyter_notebooks_jupyter_vehicles.csv'
@@ -348,9 +349,12 @@ print('On to the next, understanding how price of cars is affected by the fuel a
 # Filter the Spark DataFrame to include only used cars
 vehicles_used = vehicles_year.filter(col('condition') != 'new')
 
+vehicles_used.show()
+
 # Filter the Spark DataFrame to exclude cars with title_status 'parts only'
 vehicles_used = vehicles_used.filter(col('title_status') != 'parts only')
 
+vehicles_used.show()
 # # Create plot
 # g = sns.catplot(x='type', y='price', hue='fuel', col='transmission', data=vehicles_used.toPandas(),
 #                 kind='bar', aspect=3, height=4, palette='rocket', col_wrap=1)
@@ -381,6 +385,8 @@ vehicles_used = vehicles_used.filter(col('fuel') != 'other')
 # Filter the Spark DataFrame to exclude transmission types 'other'
 vehicles_used = vehicles_used.filter(col('transmission') != 'other')
 
+vehicles_used.show()
+
 # # Create plot
 # g = sns.catplot(x='type', y='price', hue='fuel', col='transmission', data=vehicles_used.toPandas(),
 #                 kind='bar', aspect=3, height=4, palette='rocket', col_wrap=1)
@@ -399,6 +405,8 @@ print('Next, we see how price is related to different kinds of manufacturers and
 
 # Visualize the relationship of average price by manufacturer
 grp_man_df = vehicles_used.groupBy('manufacturer').agg(avg('price').alias('avg_price')).orderBy('manufacturer')
+
+grp_man_df.show()
 
 x = [row.manufacturer for row in grp_man_df.collect()]
 y = [row.avg_price for row in grp_man_df.collect()]
@@ -429,6 +437,8 @@ vehicles_used = vehicles_used.withColumn("row_num", row_number().over(Window.ord
 
 # Get counts of models
 model_df = vehicles_used.groupBy("model").count().withColumnRenamed("count", "count_model")
+
+model_df.show()
 
 # Get only 10 frequent models and how much the other account to
 lar10_df = model_df.orderBy(col("count_model").desc()).limit(10).toPandas()
